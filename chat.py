@@ -5,6 +5,8 @@ from nltk_utils import bag_of_words, tokenize
 import json
 from flask_cors import CORS
 import logging
+from googletrans import Translator
+
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/chat": {"origins": "http://localhost:3000"}})
@@ -70,11 +72,17 @@ def chat():
                             response += f"Title: {title}\nHow to avail: {how_to_avail}\nDescription: {description}\n"
                     else:
                         response = f"{bot_name}: {(intent['response'])}"
+                    translated_response = Translator().translate(response, src='en', dest='ta').text
+
         else:
             response = f"{bot_name}: I do not understand..."
 
         logger.info(f"Response: {response}")
-        return jsonify({"message": response})
+        if translated_response:
+
+              return jsonify({"message": translated_response})
+        else:
+            return jsonify({"message":response})
 
     except Exception as e:
         logger.exception("An error occurred during chat processing")

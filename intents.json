@@ -49,7 +49,7 @@
 "response":"there are several schemes for reserved people such as ,\n 1)Educational schemes \n 2)Medical schemes \n 3)housing schemes please provide the domain"
       },
       {
-"intent":"Educational schemes",
+"intent":"Education",
 "examples":[
   "tell me educational policies for sc and sts",
   "tell me eduactional policies for marginalised communities",
@@ -67,7 +67,7 @@
         "response": "With the aim of providing quality education, 10 outstanding Adi Dravidar/Tribal students from each district, totaling 320 students, who secure the highest marks in X standard in government/corporation/municipal/Adi Dravidar and Tribal Welfare schools, are admitted in plus one in reputed private schools."
       },
       {
-        "intent": "all_india_service_examinations",
+        "intent": "all india service examinations",
         "examples": [
           "How can I get training for All India Service Examinations like IAS, IPS, IRS, etc.?",
           "Where can I find information about free coaching for All India Service Examinations?"
@@ -82,7 +82,7 @@
           "Where can I find information about the construction of free houses for tribals?"
         ],
         "criteria": "Recognizes user queries regarding the construction of free houses for tribals.",
-        "response": "Under the Construction of Free Houses for Tribals scheme, free houses are provided to tribals who possess free house site pattas. The construction of these houses is facilitated by the Commissioner, Panchayat Union, District Adi Dravidar and Tribal Welfare Officer, or the concerned Commissioner of Tribal Welfare."
+        "response": "Under the Construction of Free Houses for Tribals scheme,  free houses are provided to tribals who possess free house site pattas. The construction of these houses is facilitated by the Commissioner,  Panchayat Union, District Adi Dravidar and Tribal Welfare Officer, or the concerned Commissioner of Tribal Welfare.  How to avail : Commissioner / Panchayat Union / District Adi dravidar and Tribal Welfare Officer / Commissioner of Tribal Welfare concerned"
       }
   ]
 }

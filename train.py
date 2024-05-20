@@ -58,7 +58,7 @@ class ChatDataset(Dataset):
         return torch.tensor(self.X[idx], dtype=torch.float32), torch.tensor(self.y[idx], dtype=torch.long)
 
 train_dataset = ChatDataset(X_train, y_train)
-train_loader = DataLoader(dataset=train_dataset, batch_size=8, shuffle=True)
+train_loader = DataLoader(dataset=train_dataset, batch_size=5, shuffle=True)
 
 # Define model
 input_size = len(X_train[0])
@@ -81,7 +81,7 @@ val_losses = []
 f1_scores = []
 
 # Train the model with early stopping
-for epoch in range(10):  # Reduced epochs to 10
+for epoch in range(20):  # Reduced epochs to 10
     model.train()
     for X_batch, y_batch in train_loader:
         optimizer.zero_grad()

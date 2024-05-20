@@ -48,13 +48,14 @@ while True:
 
         probs = torch.softmax(output, dim=1)
         prob = probs[0][predicted.item()]
-        if prob.item() > 0.5:
+        if prob.item() > 0.8:
             for intent in intents['intents']:
                 if tag == intent["intent"]:
                     if tag == "scheme_application":
                         additional_schemes = intent['additional_schemes']
                         print(f"{bot_name}: Here are some additional schemes:")
                         for scheme in additional_schemes:
+                            
                             title = scheme['title']
                             how_to_avail = scheme['how_to_avail']
                             description = scheme['description']
