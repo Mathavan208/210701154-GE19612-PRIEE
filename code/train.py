@@ -1,23 +1,23 @@
-import numpy as np
-import random
 import json
-import matplotlib.pyplot as plt
-import pandas as pd
-
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, f1_score
-
-from nltk_utils import bag_of_words, tokenize, stem
+from nltk_utils import tokenize, stem, bag_of_words
 from model import NeuralNet
 
-# Load intents data
-with open('intents.json', 'r') as f:
+# Set device
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Hyperparameters
+batch_size = 8
+hidden_size = 128
+learning_rate = 0.001
+num_epochs = 1000
+
+# Load and preprocess intents data
+with open("intents.json", "r") as f:
     intents = json.load(f)
 
-# Preprocess data
 all_words = []
 tags = []
 xy = []
@@ -30,111 +30,69 @@ for intent in intents['intents']:
         all_words.extend(w)
         xy.append((w, tag))
 
-ignore_words = ['?', '.', '!']
-all_words = [stem(w) for w in all_words if w not in ignore_words]
-all_words = sorted(set(all_words))
+all_words = sorted(set(stem(w) for w in all_words if w not in ['?', '.', '!']))
 tags = sorted(set(tags))
 
-X = []
-y = []
+X_train = []
+y_train = []
 
 for (pattern_sentence, tag) in xy:
     bag = bag_of_words(pattern_sentence, all_words)
-    X.append(bag)
-    y.append(tags.index(tag))
+    X_train.append(bag)
+    y_train.append(tags.index(tag))
 
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train = torch.tensor(X_train, dtype=torch.float32)
+y_train = torch.tensor(y_train, dtype=torch.long)
 
-# Define dataset and dataloader
 class ChatDataset(Dataset):
-    def __init__(self, X, y):
-        self.X = X
-        self.y = y
+    def __init__(self):
+        self.n_samples = len(X_train)
+        self.x_data = X_train
+        self.y_data = y_train
+
+    def __getitem__(self, index):
+        return self.x_data[index], self.y_data[index]
 
     def __len__(self):
-        return len(self.X)
+        return self.n_samples
 
-    def __getitem__(self, idx):
-        return torch.tensor(self.X[idx], dtype=torch.float32), torch.tensor(self.y[idx], dtype=torch.long)
+dataset = ChatDataset()
+train_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 
-train_dataset = ChatDataset(X_train, y_train)
-train_loader = DataLoader(dataset=train_dataset, batch_size=5, shuffle=True)
-
-# Define model
+# Define model parameters and initialize model
 input_size = len(X_train[0])
 output_size = len(tags)
-hidden_size = 50
-model = NeuralNet(input_size, hidden_size, output_size)
-
-# Define loss and optimizer
+model = NeuralNet(input_size, hidden_size, output_size).to(device)
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-# Early stopping parameters
-best_val_loss = float('inf')
-patience = 5
-counter = 0
+# Training loop
+for epoch in range(num_epochs):
+    for (words, labels) in train_loader:
+        words = words.to(device)
+        labels = labels.to(device)
 
-# Lists to store loss values for plotting
-train_losses = []
-val_losses = []
-f1_scores = []
+        outputs = model(words)
+        loss = criterion(outputs, labels)
 
-# Train the model with early stopping
-for epoch in range(20):  # Reduced epochs to 10
-    model.train()
-    for X_batch, y_batch in train_loader:
         optimizer.zero_grad()
-        outputs = model(X_batch)
-        loss = criterion(outputs, y_batch)
         loss.backward()
         optimizer.step()
 
-    # Validation
-    model.eval()
-    with torch.no_grad():
-        val_outputs = model(torch.tensor(X_val, dtype=torch.float32))
-        val_loss = criterion(val_outputs, torch.tensor(y_val, dtype=torch.long))
-        val_preds = torch.argmax(val_outputs, dim=1)
-        f1 = f1_score(y_val, val_preds, average='weighted')
-        
-    train_losses.append(loss.item())
-    val_losses.append(val_loss.item())
-    f1_scores.append(f1)
-    
-    if val_loss < best_val_loss:
-        best_val_loss = val_loss
-        counter = 0
-    else:
-        counter += 1
+    if (epoch+1) % 100 == 0:
+        print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}")
 
-    if counter >= patience:
-        print(f'Early stopping at epoch {epoch+1}')
-        break
+print(f"Final loss: {loss.item():.4f}")
 
-# Create a DataFrame for the table
+# Save model
 data = {
-    'Epoch': range(1, len(train_losses) + 1),
-    'Training Loss': train_losses,
-    'Validation Loss': val_losses,
-    'F1 Score': f1_scores
+    "model_state": model.state_dict(),
+    "input_size": input_size,
+    "hidden_size": hidden_size,
+    "output_size": output_size,
+    "all_words": all_words,
+    "tags": tags
 }
-df = pd.DataFrame(data)
 
-# Print the table
-print(df)
-
-# Plotting the training and validation losses
-plt.plot(train_losses, label='Training Loss')
-plt.plot(val_losses, label='Validation Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Training and Validation Losses')
-plt.legend()
-plt.show()
-
-# Save the compressed model
-compressed_model = model.cpu()
-torch.save(compressed_model.state_dict(), 'compressed_model.pth')
-
-print('Training complete. Compressed model saved.')
+torch.save(data, "data.pth")
+print("Training complete. Model saved as 'data.pth'")

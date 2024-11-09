@@ -1,41 +1,135 @@
+/* Background and Container Styling */
 .chat-container {
-    max-width: 500px;
-    margin: auto;
+    background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+    border-radius: 15px;
     padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chat-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .chat-messages {
-    overflow-y: scroll;
-    max-height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Message styling */
 .message {
+    padding: 12px 18px;
+    border-radius: 20px;
     margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 10px;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    max-width: 80%;
 }
 
 .user {
-    background-color: #007bff;
-    color: white;
-    align-self: flex-start;
-}
-
-.bot {
-    background-color: #28a745;
+    background-color: #4e73df;
     color: white;
     align-self: flex-end;
 }
 
+.bot {
+    background-color: #f8f9fa;
+    color: #333;
+    align-self: flex-start;
+}
+
+/* Input Container */
 .input-container {
     margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.input-container input {
-    width: calc(100% - 85px);
-    margin-right: 10px;
+/* Form Styling */
+.input-label {
+    color: #333;
+    font-size: 1rem;
+    margin-bottom: 10px;
 }
 
-.input-container button {
-    width: 75px;
+.input-field {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    transition: border 0.3s ease;
+}
+
+.input-field:focus {
+    border-color: #4e73df;
+    outline: none;
+}
+
+/* Buttons Container Styling */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+}
+
+/* Send Button */
+.send-btn {
+    background-color: #4e73df;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color 0.3s;
+}
+
+.send-btn:hover {
+    background-color: #2e59d9;
+}
+
+/* Speech Button */
+.listen-button {
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color 0.3s;
+}
+
+.listen-button:hover {
+    background-color: #ddd;
+}
+
+/* Icons inside buttons */
+.btn-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Transcript Styling */
+.transcript {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 10px;
+    font-style: italic;
 }
